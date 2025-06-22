@@ -82,9 +82,12 @@ ssh -i your-key.pem ec2-user@<APP-SERVER-PUBLIC-IP>
 #### 2. Update and install Python
 
 ```bash
-sudo yum update -y
-sudo yum install -y python3
-sudo pip3 install flask
+sudo su
+yum update -y
+yum install -y python3
+yum install python3-pip -y
+pip3 install flask
+
 ```
 
 #### 3. Create and run a Flask app
@@ -129,7 +132,6 @@ ssh -i your-key.pem ec2-user@<PROXY-SERVER-PUBLIC-IP>
 #### 2. Install NGINX
 
 ```bash
-sudo amazon-linux-extras enable nginx1
 sudo yum install -y nginx
 ```
 
