@@ -2,15 +2,28 @@
 # 🔌 Understanding Proxies
 
 <img src="https://github.com/bhuvan-raj/Linux-Proxy/blob/main/linux-proxy-server.png" alt="Banner" />
+
+
+
 ## 📘 What is a Proxy?
 
 A **proxy** is an intermediary server that sits between a client and a destination server. It forwards requests from the client to another server and then sends the response back to the client.
 
 ---
 
+<img src="https://github.com/bhuvan-raj/Linux-Proxy/blob/main/proxy.png" alt="Banner" />
+
 ## 🔄 Types of Proxies
 
 ### 1. **Forward Proxy**
+
+
+
+
+<img src="https://github.com/bhuvan-raj/Linux-Proxy/blob/main/forward-proxy.png" alt="Banner" />
+
+
+
 
 * Sits **in front of clients**.
 * Used to access the internet on behalf of clients.
@@ -23,6 +36,13 @@ A **proxy** is an intermediary server that sits between a client and a destinati
 * Anonymous browsing
 
 ### 2. **Reverse Proxy**
+
+
+
+<img src="https://github.com/bhuvan-raj/Linux-Proxy/blob/main/reverse-proxy.png" alt="Banner" />
+
+
+
 
 * Sits **in front of servers**.
 * Accepts requests from clients and forwards them to the appropriate backend server.
