@@ -44,52 +44,57 @@ A **proxy** is an intermediary server that sits between a client and a destinati
 
 ---
 
+
 # 🚀 Setup: Reverse Proxy using NGINX on AWS EC2 (Amazon Linux)
 
-## 📦 What This Guide Covers
+## 📆 What This Guide Covers
 
-* Installing and configuring NGINX as a reverse proxy
-* Running everything on an EC2 instance (Amazon Linux 2)
+* Creating a small Flask app in Python on one EC2 instance (App Server)
+* Setting up a second EC2 instance as a reverse proxy with NGINX (Proxy Server)
+* Connecting the reverse proxy to the backend app server
 
 ---
 
 ## ✅ Prerequisites
 
-* Amazon EC2 instance with Amazon Linux 2
-* Inbound rule in security group allowing **port 80**
-* SSH access to EC2 instance
+* Two Amazon EC2 instances (Amazon Linux 2)
+
+  * **App Server** to host the Python Flask application
+  * **Proxy Server** to act as the reverse proxy
+* Inbound rule in security group:
+
+  * **App Server:** Port 3000 open for internal access (from Proxy Server)
+  * **Proxy Server:** Port 80 open to public
+* SSH access to both EC2 instances
 
 ---
 
 ## 🔧 Step-by-Step Instructions
 
-### 1️⃣ SSH into your EC2 instance
+### 1⃣ Set Up Flask on App Server (Backend)
+
+#### 1. SSH into the App Server
 
 ```bash
-ssh -i your-key.pem ec2-user@<EC2-PUBLIC-IP>
+ssh -i your-key.pem ec2-user@<APP-SERVER-PUBLIC-IP>
 ```
 
-### 2️⃣ Update the system
+#### 2. Update and install Python
 
 ```bash
 sudo yum update -y
-```
-
-### 3️⃣ Install Python 3 and pip
-
-```bash
 sudo yum install -y python3
 sudo pip3 install flask
 ```
 
-### 4️⃣ Create a simple Flask app
+#### 3. Create and run a Flask app
 
 ```bash
 mkdir flask-app && cd flask-app
 nano app.py
 ```
 
-Paste the following Flask code:
+Paste this code:
 
 ```python
 from flask import Flask
@@ -97,54 +102,60 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return "<h1>Hello from Flask behind NGINX!</h1>"
+    return "<h1>Hello from Flask App Server!</h1>"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)
 ```
 
-### 5️⃣ Run the Flask app
+Run the app:
 
 ```bash
 python3 app.py
 ```
 
-Flask will now run on port 3000.
+Keep this running (or run in background using `nohup` or `tmux`).
 
 ---
 
-## 🌐 Set Up NGINX as a Reverse Proxy
+### 2⃣ Set Up NGINX Reverse Proxy on Proxy Server
 
-### 6️⃣ Install NGINX
+#### 1. SSH into the Proxy Server
+
+```bash
+ssh -i your-key.pem ec2-user@<PROXY-SERVER-PUBLIC-IP>
+```
+
+#### 2. Install NGINX
 
 ```bash
 sudo amazon-linux-extras enable nginx1
 sudo yum install -y nginx
 ```
 
-### 7️⃣ Start and enable NGINX
+#### 3. Start and enable NGINX
 
 ```bash
 sudo systemctl start nginx
 sudo systemctl enable nginx
 ```
 
-### 8️⃣ Configure reverse proxy
+#### 4. Configure NGINX as reverse proxy
 
-Edit the config:
+Edit config:
 
 ```bash
 sudo nano /etc/nginx/nginx.conf
 ```
 
-Inside the `http` block, add or modify this `server` block:
+In the `http` block, modify or add this server block:
 
 ```nginx
 server {
     listen 80;
 
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://<APP-SERVER-PRIVATE-IP>:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -154,7 +165,9 @@ server {
 }
 ```
 
-### 9️⃣ Restart NGINX
+> Replace `<APP-SERVER-PRIVATE-IP>` with the private IP of the App Server.
+
+#### 5. Restart NGINX
 
 ```bash
 sudo systemctl restart nginx
@@ -164,12 +177,12 @@ sudo systemctl restart nginx
 
 ## 🔎 Test the Setup
 
-* Open your browser and go to: `http://<EC2-PUBLIC-IP>`
-* You should see: `Hello from Flask behind NGINX!`
+* Open browser and visit: `http://<PROXY-SERVER-PUBLIC-IP>`
+* You should see: `Hello from Flask App Server!`
 
 ---
 
-## 📁 Folder Structure
+## 📁 Folder Structure (on App Server)
 
 ```
 /home/ec2-user/flask-app/
@@ -180,11 +193,11 @@ sudo systemctl restart nginx
 
 ## ✅ Summary
 
-* Flask runs your backend on port 3000
-* NGINX forwards requests from port 80 to Flask
-* EC2 security group must allow HTTP traffic
+* Flask app runs on **App Server** (port 3000)
+* NGINX on **Proxy Server** forwards traffic to App Server
+* Useful for scaling, security, and access control
 
-Let me know if you'd like to dockerize this setup or deploy with Terraform!
+
 
 ## 📌 Summary
 
