@@ -1,5 +1,7 @@
+
 # 🔌 Understanding Proxies
 
+<img src="https://github.com/bhuvan-raj/Logical-Volume-Management/blob/main/linux-proxy-server.png" alt="Banner" />
 ## 📘 What is a Proxy?
 
 A **proxy** is an intermediary server that sits between a client and a destination server. It forwards requests from the client to another server and then sends the response back to the client.
